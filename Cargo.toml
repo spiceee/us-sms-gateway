@@ -1,0 +1,70 @@
+[package]
+name = "us-sms-gateway"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-session = { version = "0.9", features = ["cookie-session"] }
+actix = "0.13"
+actix-broker = "0.4"
+actix-codec = "0.5"
+actix-cors = "0.7"
+actix-files = "0.6"
+actix-http = "3.5"
+actix-identity = "0.7"
+actix-multipart = "0.6"
+actix-multipart-derive = "0.6"
+actix-protobuf = "0.10"
+actix-test = "0.1"
+actix-tls = "3.2"
+actix-utils = "3"
+actix-web = { version = "4.4", features = ["cookies"] }
+actix-web-actors = "4.1"
+actix-web-lab = "0.20"
+actix-ws = "0.2.5"
+actix-rt = "2.2.0"
+actix-service = "2.0.0"
+actix-extensible-rate-limit = { version = "0.3.1", features = ["redis"] }
+
+deadpool-postgres = { version = "0.12", features = ["serde"] }
+serde = { version = "1.0.137", features = ["derive"] }
+tokio-pg-mapper = "0.2.0"
+tokio-pg-mapper-derive = "0.2.0"
+tokio-postgres = "0.7.6"
+postgres = { version = "0.19.7", features = ["with-chrono-0_4"] }
+config = "0.13"
+rust_decimal = { version = "1.34.2", features = ["db-tokio-postgres"] }
+
+tokio = { version = "1.24.2", features = ["sync", "io-util"] }
+tokio-util = "0.7.4"
+tokio-stream = "0.1.1"
+refinery = { version = "0.8.12", features = ["tokio-postgres"] }
+barrel = { version = "0.7.0", features = ["pg"] }
+redis = { version = "0.24.0", default-features = false, features = [
+    "tokio-comp",
+    "aio",
+    "connection-manager",
+] }
+
+derive_more = "0.99.7"
+chrono = { version = "0.4.20", default-features = false, features = [
+    "clock",
+    "serde",
+] }
+dotenvy = "0.15"
+env_logger = "0.10"
+futures = "0.3.14"
+futures-util = { version = "0.3.17", default-features = false, features = [
+    "std",
+] }
+log = "0.4"
+openssl = { version = "0.10.60", features = ["v110"] }
+rand = "0.8"
+rustls = "0.21"
+serde_json = "1"
+async-stream = "0.3"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
