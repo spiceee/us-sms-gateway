@@ -65,19 +65,16 @@ mod handlers {
             .await
             .unwrap();
 
-        Ok(HttpResponse::Ok()
-            .content_type("text/plain")
-            .body(format!("{:?}", params)))
-
-        // Ok(HttpResponse::Ok().into())
+        Ok(HttpResponse::Ok().content_type("text/xml").body(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Message></Message></Response>"
+                .to_string(),
+        ))
     }
 
     pub async fn welcome(_req: HttpRequest) -> Result<HttpResponse, Error> {
         Ok(HttpResponse::Ok()
             .content_type("text/plain")
-            .body(format!("Hello!",)))
-
-        // Ok(HttpResponse::Ok().into())
+            .body("Hello!".to_string()))
     }
 }
 
