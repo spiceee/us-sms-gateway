@@ -1,19 +1,13 @@
 #![allow(unused_imports)]
-use actix_test::config;
-use actix_web::middleware::Logger;
 use actix_web::{
-    get,
-    http::{Method, StatusCode},
-    web, App, Either, Error, HttpRequest, HttpResponse, HttpServer, Responder, Result,
+    http::Method, middleware::Logger, web, App, HttpResponse, HttpServer, Responder, Result,
 };
-use config::Config;
 use dotenvy::dotenv;
 use redis::aio::ConnectionManager;
-use redis::AsyncCommands;
 use std::env;
 
 mod models {
-    use chrono::{format::Numeric, DateTime, Utc};
+
     use serde::{Deserialize, Serialize};
 
     #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -46,8 +40,6 @@ mod handlers {
     use actix_web::{web, Error, HttpRequest, HttpResponse};
     use redis::aio::ConnectionManager;
     use redis::AsyncCommands;
-    use redis::Commands;
-    use redis::Connection;
 
     pub async fn record_incoming_message(
         params: web::Form<IncomingMessage>,
