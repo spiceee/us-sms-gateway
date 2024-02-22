@@ -7,7 +7,6 @@ use redis::aio::ConnectionManager;
 use std::env;
 
 mod models {
-
     use serde::{Deserialize, Serialize};
 
     #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -64,7 +63,7 @@ mod handlers {
         ))
     }
 
-    pub async fn welcome(_req: HttpRequest) -> Result<HttpResponse, Error> {
+    pub async fn healthcheck(_req: HttpRequest) -> Result<HttpResponse, Error> {
         Ok(HttpResponse::Ok()
             .content_type("text/plain")
             .body("Hello!".to_string()))
@@ -75,7 +74,7 @@ async fn default_handler(_req_method: Method) -> Result<impl Responder> {
     Ok(HttpResponse::MethodNotAllowed().finish())
 }
 
-use handlers::{record_incoming_message, welcome};
+use handlers::{healthcheck, record_incoming_message};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -95,7 +94,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .app_data(web::Data::new(backend.clone()))
             .service(web::resource("/incoming").route(web::post().to(record_incoming_message)))
-            .service(web::resource("/test").route(web::get().to(welcome)))
+            .service(web::resource("/healthcheck").route(web::get().to(healthcheck)))
             .default_service(web::to(default_handler))
     })
     .bind(("0.0.0.0", port))?
