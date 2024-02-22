@@ -1,4 +1,3 @@
-#![allow(unused_imports)]
 use actix_web::{
     http::Method, middleware::Logger, web, App, HttpResponse, HttpServer, Responder, Result,
 };
@@ -58,7 +57,6 @@ mod handlers {
         params: web::Form<IncomingMessage>,
         query: web::Query<GlobalConfig>,
         config: web::Data<AppState>,
-        _req: HttpRequest,
     ) -> Result<HttpResponse, Error> {
         Logger::new("New message {params:?}");
         let mut validated = false;
