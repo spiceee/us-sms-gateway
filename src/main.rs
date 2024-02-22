@@ -19,7 +19,7 @@ mod models {
     #[derive(Deserialize, Serialize, Clone, Debug)]
     pub struct IncomingMessage {
         #[serde(rename = "MessageSid")]
-        pub message_sid: Option<String>,
+        pub message_sid: String,
         #[serde(rename = "SmsSid")]
         pub sms_id: Option<String>,
         #[serde(rename = "SmsMessageSid")]
@@ -44,14 +44,26 @@ mod models {
 mod handlers {
     use crate::models::IncomingMessage;
     use actix_web::{web, Error, HttpRequest, HttpResponse};
+    use redis::aio::ConnectionManager;
+    use redis::AsyncCommands;
+    use redis::Commands;
     use redis::Connection;
 
     pub async fn record_incoming_message(
         params: web::Form<IncomingMessage>,
-        _redis_conn: web::Data<Connection>,
+        redis_conn: web::Data<ConnectionManager>,
         _req: HttpRequest,
     ) -> Result<HttpResponse, Error> {
         println!("{params:?}");
+
+        let mut redis = redis_conn.get_ref().clone();
+        let _: () = redis
+            .set(
+                params.message_sid.clone(),
+                format!("From: {} Body: {}", params.from, params.body),
+            )
+            .await
+            .unwrap();
 
         Ok(HttpResponse::Ok()
             .content_type("text/plain")
@@ -86,13 +98,12 @@ async fn main() -> std::io::Result<()> {
     let redis_url = env::var("REDIS_PRIVATE_URL").expect("Missing Redis URL");
 
     let client = redis::Client::open(redis_url).unwrap();
+    let backend = ConnectionManager::new(client).await.unwrap();
 
     let server = HttpServer::new(move || {
-        let backend = client.get_connection().unwrap();
-
         App::new()
             .wrap(Logger::default())
-            .app_data(web::Data::new(backend))
+            .app_data(web::Data::new(backend.clone()))
             .service(web::resource("/incoming").route(web::post().to(record_incoming_message)))
             .service(web::resource("/test").route(web::get().to(welcome)))
             .default_service(web::to(default_handler))
