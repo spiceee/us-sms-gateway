@@ -65,6 +65,7 @@ rand = "0.8"
 rustls = "0.21"
 serde_json = "1"
 async-stream = "0.3"
+orion = "0.17.6"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
