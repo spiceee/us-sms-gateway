@@ -110,8 +110,8 @@ async fn main() -> std::io::Result<()> {
     let port = port.parse::<u16>().expect("Invalid port given");
 
     let secret_token = env::var("PRIVATE_EXCHANGE_TOKEN").expect("Missing port number");
-    let redis_url = env::var("REDIS_PRIVATE_URL").expect("Missing Redis URL");
 
+    let redis_url = env::var("REDIS_PRIVATE_URL").expect("Missing Redis URL");
     let client = redis::Client::open(redis_url).unwrap();
     let backend = ConnectionManager::new(client).await.unwrap();
 
