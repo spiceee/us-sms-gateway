@@ -37,6 +37,7 @@ mod models {
 
 mod handlers {
     use crate::models::IncomingMessage;
+    use actix_web::middleware::Logger;
     use actix_web::{web, Error, HttpRequest, HttpResponse};
     use redis::aio::ConnectionManager;
     use redis::AsyncCommands;
@@ -46,7 +47,7 @@ mod handlers {
         redis_conn: web::Data<ConnectionManager>,
         _req: HttpRequest,
     ) -> Result<HttpResponse, Error> {
-        println!("{params:?}");
+        Logger::new("New message {params:?}");
 
         let mut redis = redis_conn.get_ref().clone();
         let _: () = redis
@@ -55,7 +56,7 @@ mod handlers {
                 format!("From: {} Body: {}", params.from, params.body),
             )
             .await
-            .unwrap();
+            .expect("Failed to write to Redis");
 
         Ok(HttpResponse::Ok().content_type("text/xml").body(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Message></Message></Response>"
