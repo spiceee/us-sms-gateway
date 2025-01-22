@@ -1,4 +1,4 @@
-## Twilio Webhook: Persist SMS in Redis
+## Twilio Webhook: Rust server that persists SMS in Redis
 
 ### Motivation
 
