@@ -1,3 +1,7 @@
+#![deny(clippy::all)]
+#![warn(clippy::pedantic)]
+#![warn(clippy::nursery)]
+
 use actix_web::{
     http::Method, middleware::Logger, web, App, HttpResponse, HttpServer, Responder, Result,
 };
@@ -58,36 +62,37 @@ mod handlers {
         query: web::Query<GlobalConfig>,
         config: web::Data<AppState>,
     ) -> Result<HttpResponse, Error> {
-        Logger::new("New message {params:?}");
+        Logger::new("New message");
+
         let mut validated = false;
         let token = config.global_config.token.clone().expect("No token found");
 
         if let Some(token_from_query) = query.token.clone() {
-            validated = secure_cmp(token_from_query.clone().as_bytes(), token.as_bytes()).is_ok()
+            validated = secure_cmp(token_from_query.as_bytes(), token.as_bytes()).is_ok();
         }
 
-        match validated {
-            true => {
-                let mut redis = config.redis.clone();
-                let _: () = redis
-                    .set(
-                        params.message_sid.clone(),
-                        format!("From: {} Body: {}", params.from, params.body),
-                    )
-                    .await
-                    .expect("Failed to write to Redis");
+        if validated {
+            let mut redis = config.redis.clone();
+            let _: () = redis
+                .set(
+                    params.message_sid.clone(),
+                    format!("From: {} Body: {}", params.from, params.body),
+                )
+                .await
+                .expect("Failed to write to Redis");
 
-                Ok(HttpResponse::Ok().content_type("text/xml").body(
+            Ok(HttpResponse::Ok().content_type("text/xml").body(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Message></Message></Response>"
                         .to_string(),
                 ))
-            }
-            false => {
-                return Ok(HttpResponse::Unauthorized().finish());
-            }
+        } else {
+            Ok(HttpResponse::Unauthorized().finish())
         }
     }
 
+    // Disable clippy::future_not_send warning
+    // actix-web handlers are not Send because they run as a tokio single-threaded async runtime
+    #[allow(clippy::future_not_send)]
     pub async fn healthcheck(_req: HttpRequest) -> Result<HttpResponse, Error> {
         Ok(HttpResponse::Ok()
             .content_type("text/plain")
@@ -133,7 +138,7 @@ async fn main() -> std::io::Result<()> {
     .bind(("0.0.0.0", port))?
     .run();
 
-    println!("Server running at http://0.0.0.0:{}/", port);
+    println!("Server running at http://0.0.0.0:{port}/");
 
     server.await
 }
