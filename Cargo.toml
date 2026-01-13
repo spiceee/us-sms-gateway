@@ -15,4 +15,4 @@ redis = { version = "1.0.2", default-features = false, features = [
     "connection-manager",
 ] }
 dotenvy = "0.15"
-orion = "0.17.11"
+orion = "0.17.12"
